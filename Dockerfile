@@ -7,10 +7,12 @@ WORKDIR /app
 
 RUN pip install --no-cache-dir uv
 
-ENV UV_HTTP_TIMEOUT=120
+ENV UV_HTTP_TIMEOUT=300
+ENV UV_RETRIES=10
+ENV UV_NO_CACHE=1
 
 COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-group dev
+RUN uv sync --frozen --no-dev
 
 COPY . .
 

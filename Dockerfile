@@ -5,7 +5,7 @@ RUN addgroup --system --gid 1000 appuser && \
 
 WORKDIR /app
 
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+RUN pip install --no-cache-dir uv
 
 ENV UV_HTTP_TIMEOUT=120
 

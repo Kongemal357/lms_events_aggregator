@@ -7,8 +7,10 @@ WORKDIR /app
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
+ENV UV_HTTP_TIMEOUT=120
+
 COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-dev --timeout 120 --retries 5
+RUN uv sync --frozen --no-dev
 
 COPY . .
 

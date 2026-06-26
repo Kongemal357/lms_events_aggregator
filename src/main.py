@@ -3,12 +3,11 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from src.api.routes.health import router as health_router
-from src.core.database import init_db
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await init_db()
+
     yield
 
 

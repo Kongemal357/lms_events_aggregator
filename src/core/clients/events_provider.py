@@ -1,4 +1,3 @@
-import asyncio
 import os
 from typing import AsyncIterator
 
@@ -13,7 +12,7 @@ class EventsProviderClient:
         base_url: str | None = None,
         api_key: str | None = None,
         timeout: float = 30.0,
-        follow_redirects: bool =True,
+        follow_redirects: bool = True,
     ):
         self.base_url = (base_url or os.getenv("EVENTS_PROVIDER_URL", "")).rstrip("/")
         self.api_key = api_key or os.getenv("EVENTS_PROVIDER_API_KEY", "")
@@ -30,8 +29,8 @@ class EventsProviderClient:
             params["cursor"] = cursor
 
         async with httpx.AsyncClient(
-                timeout=self.timeout,
-                follow_redirects=self.follow_redirects,
+            timeout=self.timeout,
+            follow_redirects=self.follow_redirects,
         ) as client:
             response = await client.get(
                 f"{self.base_url}/api/events/",

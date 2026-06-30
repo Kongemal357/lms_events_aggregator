@@ -14,9 +14,7 @@ class SyncRepository:
 
     async def get(self) -> SyncMetadata:
         """Return the single sync metadata row, creating it if missing."""
-        result = await self.session.execute(
-            select(SyncMetadata).where(SyncMetadata.id == 1)
-        )
+        result = await self.session.execute(select(SyncMetadata).where(SyncMetadata.id == 1))
         meta = result.scalar_one_or_none()
         if meta is None:
             meta = SyncMetadata(id=1)

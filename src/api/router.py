@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from src.api.routes import health, events, sync
+from src.api.routes import events, health, sync
 
 api_router = APIRouter(prefix="/api")
 api_router.include_router(health.router)

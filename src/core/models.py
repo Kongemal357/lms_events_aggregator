@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import String, DateTime, Boolean, Integer, ForeignKey
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -17,14 +17,10 @@ class Event(Base):
 
     __tablename__ = "events"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String, nullable=False)
     event_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    registration_deadline: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False
-    )
+    registration_deadline: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     status: Mapped[str] = mapped_column(String, nullable=False)
     number_of_visitors: Mapped[int] = mapped_column(Integer, default=0)
 
@@ -37,15 +33,11 @@ class Event(Base):
 
     # Sync metadata from provider
     changed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    provider_created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    provider_created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
 
     # Local tracking
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    last_synced_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False
-    )
+    last_synced_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
     tickets: Mapped[list["Ticket"]] = relationship(
         "Ticket", back_populates="event", lazy="selectin"
@@ -61,9 +53,7 @@ class Ticket(Base):
 
     __tablename__ = "tickets"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     ticket_id: Mapped[str] = mapped_column(String, nullable=False)
     event_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("events.id"), nullable=False
@@ -73,9 +63,7 @@ class Ticket(Base):
     email: Mapped[str] = mapped_column(String, nullable=False)
     seat: Mapped[str] = mapped_column(String, nullable=False)
     status: Mapped[str] = mapped_column(String, nullable=False, default="active")
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=datetime.utcnow
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
 
     event: Mapped["Event"] = relationship("Event", back_populates="tickets")
 

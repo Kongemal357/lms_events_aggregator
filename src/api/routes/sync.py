@@ -33,9 +33,7 @@ async def trigger_sync(usecase=Depends(get_sync_usecase)):
     """
     try:
         synced_count = await usecase.do()
-        return SyncTriggerResponse(
-            message=f"Sync completed, {synced_count} events synced"
-        )
+        return SyncTriggerResponse(message=f"Sync completed, {synced_count} events synced")
     except SyncInProgress as e:
         raise HTTPException(status_code=409, detail=str(e))
     except HTTPException:

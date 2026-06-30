@@ -2,7 +2,6 @@ import uuid
 from datetime import datetime, timezone
 
 from sqlalchemy import func, select, update
-from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.models import Event
@@ -43,48 +42,44 @@ class EventRepository:
 
         return events, total
 
-
-    async def upsert(self, event_data: dict) -> None:
-        """Insert or update an event using ON CONFLICT DO UPDATE.
-
-        No preliminary SELECT — single INSERT with upsert logic.
-        """
-        for field in (
-                "event_time", "registration_deadline", "changed_at",
-                "provider_created_at"
-        ):
+    async def upsert(self, event_data: dict) -> Event:
+        """Create or update an event from provider data."""
+        for field in ("event_time", "registration_deadline", "changed_at", "provider_created_at"):
             if field in event_data and isinstance(event_data[field], str):
                 event_data[field] = datetime.fromisoformat(event_data[field])
 
-        event_data.setdefault("is_active", True)
-        event_data.setdefault("last_synced_at", datetime.now(timezone.utc))
+        existing = await self.get_by_id(event_data["id"])
 
-        valid_fields = {c.name for c in Event.__table__.columns}
-        filtered = {k: v for k, v in event_data.items() if k in valid_fields}
-
-        stmt = pg_insert(Event).values(**filtered)
-        stmt = stmt.on_conflict_do_update(
-            index_elements=["id"],
-            set_={
-                "name": stmt.excluded.name,
-                "event_time": stmt.excluded.event_time,
-                "registration_deadline": stmt.excluded.registration_deadline,
-                "status": stmt.excluded.status,
-                "number_of_visitors": stmt.excluded.number_of_visitors,
-                "place_id": stmt.excluded.place_id,
-                "place_name": stmt.excluded.place_name,
-                "place_city": stmt.excluded.place_city,
-                "place_address": stmt.excluded.place_address,
-                "place_seats_pattern": stmt.excluded.place_seats_pattern,
-                "changed_at": stmt.excluded.changed_at,
-                "provider_created_at": stmt.excluded.provider_created_at,
-                "is_active": True,
-                "last_synced_at": datetime.now(timezone.utc),
-            },
-        )
-
-        await self.session.execute(stmt)
-        await self.session.commit()
+        if existing:
+            for field in (
+                "name",
+                "event_time",
+                "registration_deadline",
+                "status",
+                "number_of_visitors",
+                "place_id",
+                "place_name",
+                "place_city",
+                "place_address",
+                "place_seats_pattern",
+                "changed_at",
+                "provider_created_at",
+            ):
+                if field in event_data:
+                    setattr(existing, field, event_data[field])
+            existing.is_active = True
+            existing.last_synced_at = datetime.now(timezone.utc)
+            await self.session.commit()
+            return existing
+        else:
+            event = Event(
+                **{k: v for k, v in event_data.items() if hasattr(Event, k)},
+                is_active=True,
+                last_synced_at=datetime.now(timezone.utc),
+            )
+            self.session.add(event)
+            await self.session.commit()
+            return event
 
     async def deactivate_missing(self, active_ids: set[uuid.UUID]) -> int:
         """Mark events as inactive if they are not in active_ids. Returns count."""

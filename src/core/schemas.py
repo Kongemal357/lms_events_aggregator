@@ -6,7 +6,8 @@ from pydantic import BaseModel, model_validator
 
 # ─── Place ───────────────────────────────────────────
 class PlaceBriefSchema(BaseModel):
-    """Place in event list — no seats_pattern."""
+    """Place in event list — without seats_pattern."""
+
     id: uuid.UUID
     name: str
     city: str
@@ -16,7 +17,8 @@ class PlaceBriefSchema(BaseModel):
 
 
 class PlaceDetailSchema(PlaceBriefSchema):
-    """Place in event details — with seats_pattern."""
+    """Place in event details — includes seats_pattern."""
+
     seats_pattern: str
 
     model_config = {"from_attributes": True}
@@ -24,7 +26,11 @@ class PlaceDetailSchema(PlaceBriefSchema):
 
 # ─── Event ───────────────────────────────────────────
 class EventSchema(BaseModel):
-    """Event in list."""
+    """Event in paginated list.
+
+    Returned in GET /api/events/ inside EventListResponse.results.
+    """
+
     id: uuid.UUID
     name: str
     place: PlaceBriefSchema
@@ -38,6 +44,7 @@ class EventSchema(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def flatten_place(cls, data):
+        """Build nested PlaceBrief from denormalized ORM fields."""
         if isinstance(data, dict):
             return data
         return {
@@ -57,12 +64,18 @@ class EventSchema(BaseModel):
 
 
 class EventDetailResponse(EventSchema):
-    """Event details — place includes seats_pattern."""
+    """Event details.
+
+    Returned by GET /api/events/{event_id}/.
+    Differs from EventSchema by including seats_pattern in place.
+    """
+
     place: PlaceDetailSchema
 
     @model_validator(mode="before")
     @classmethod
     def flatten_place(cls, data):
+        """Build nested PlaceDetail from denormalized ORM fields."""
         if isinstance(data, dict):
             return data
         return {
@@ -83,6 +96,11 @@ class EventDetailResponse(EventSchema):
 
 
 class EventListResponse(BaseModel):
+    """Paginated list of events.
+
+    Returned by GET /api/events/.
+    """
+
     count: int
     next: str | None
     previous: str | None
@@ -91,4 +109,9 @@ class EventListResponse(BaseModel):
 
 # ─── Sync ───────────────────────────────────────────
 class SyncTriggerResponse(BaseModel):
+    """Response after triggering a manual sync.
+
+    Returned by POST /api/sync/trigger/.
+    """
+
     message: str

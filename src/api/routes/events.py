@@ -11,7 +11,7 @@ router = APIRouter(prefix="/events", tags=["events"])
 
 
 @router.get(
-    "/",
+    "",
     response_model=EventListResponse,
     summary="List events",
     description="""
@@ -75,7 +75,7 @@ async def list_events(
 
 
 @router.get(
-    "/{event_id}/",
+    "/{event_id}",
     response_model=EventDetailResponse,
     summary="Get event details",
     description="""

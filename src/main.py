@@ -11,5 +11,9 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    title="Events Aggregator",
+    lifespan=lifespan,
+    redirect_slashes=False,
+)
 app.include_router(api_router)

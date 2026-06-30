@@ -9,7 +9,7 @@ router = APIRouter(prefix="/sync", tags=["sync"])
 
 
 @router.post(
-    "/trigger/",
+    "/trigger",
     response_model=SyncTriggerResponse,
     summary="Trigger manual sync",
     description="""

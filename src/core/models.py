@@ -38,7 +38,7 @@ class Event(Base):
     # Sync metadata from provider
     changed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     provider_created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False
+        DateTime(timezone=True), nullable=True
     )
 
     # Local tracking

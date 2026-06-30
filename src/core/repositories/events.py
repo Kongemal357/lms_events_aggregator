@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import select, func, update
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.models import Event
@@ -16,7 +16,7 @@ class EventRepository:
     async def get_by_id(self, event_id: uuid.UUID) -> Event | None:
         """Return active event by ID or None."""
         result = await self.session.execute(
-            select(Event).where(Event.id == event_id, Event.is_active == True)
+            select(Event).where(Event.id == event_id, Event.is_active)
         )
         return result.scalar_one_or_none()
 
@@ -27,8 +27,8 @@ class EventRepository:
         page_size: int = 20,
     ) -> tuple[list[Event], int]:
         """Return paginated active events, optionally filtered by date_from."""
-        base = select(Event).where(Event.is_active == True)
-        count_base = select(func.count(Event.id)).where(Event.is_active == True)
+        base = select(Event).where(Event.is_active)
+        count_base = select(func.count(Event.id)).where(Event.is_active)
 
         if date_from:
             base = base.where(Event.event_time >= date_from)
@@ -44,8 +44,7 @@ class EventRepository:
 
     async def upsert(self, event_data: dict) -> Event:
         """Create or update an event from provider data."""
-        for field in ("event_time", "registration_deadline", "changed_at",
-                      "provider_created_at"):
+        for field in ("event_time", "registration_deadline", "changed_at", "provider_created_at"):
             if field in event_data and isinstance(event_data[field], str):
                 event_data[field] = datetime.fromisoformat(event_data[field])
 
@@ -53,10 +52,18 @@ class EventRepository:
 
         if existing:
             for field in (
-                    "name", "event_time", "registration_deadline", "status",
-                    "number_of_visitors", "place_id", "place_name", "place_city",
-                    "place_address", "place_seats_pattern", "changed_at",
-                    "provider_created_at",
+                "name",
+                "event_time",
+                "registration_deadline",
+                "status",
+                "number_of_visitors",
+                "place_id",
+                "place_name",
+                "place_city",
+                "place_address",
+                "place_seats_pattern",
+                "changed_at",
+                "provider_created_at",
             ):
                 if field in event_data:
                     setattr(existing, field, event_data[field])
@@ -78,7 +85,7 @@ class EventRepository:
         """Mark events as inactive if they are not in active_ids. Returns count."""
         result = await self.session.execute(
             update(Event)
-            .where(Event.id.not_in(active_ids), Event.is_active == True)
+            .where(Event.id.not_in(active_ids), Event.is_active)
             .values(is_active=False, last_synced_at=datetime.now(timezone.utc))
         )
         await self.session.commit()

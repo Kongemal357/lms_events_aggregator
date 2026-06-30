@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from src.core.clients.events_provider import EventsProviderClient, EventsPaginator
+from src.core.clients.events_provider import EventsPaginator, EventsProviderClient
 from src.core.repositories.events import EventRepository
 from src.core.repositories.sync import SyncRepository
 

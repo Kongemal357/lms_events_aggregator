@@ -1,16 +1,16 @@
-from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.database import get_session
 from src.core.clients.events_provider import EventsProviderClient
+from src.core.database import get_session
 from src.core.repositories.events import EventRepository
 from src.core.repositories.sync import SyncRepository
-from src.core.usecases.get_events import GetEventsUsecase
 from src.core.usecases.get_event_detail import GetEventDetailUsecase
+from src.core.usecases.get_events import GetEventsUsecase
 from src.core.usecases.sync_events import SyncEventsUsecase
 
-
 # ─── Repositories ─────────────────────────
+
 
 async def get_events_repo(session: AsyncSession = Depends(get_session)) -> EventRepository:
     """Return EventRepository bound to the current database session."""
@@ -24,6 +24,7 @@ async def get_sync_repo(session: AsyncSession = Depends(get_session)) -> SyncRep
 
 # ─── External clients ─────────────────────
 
+
 async def get_client() -> EventsProviderClient:
     """Return a configured EventsProviderClient.
 
@@ -33,6 +34,7 @@ async def get_client() -> EventsProviderClient:
 
 
 # ─── UseCases ─────────────────────────────
+
 
 async def get_events_usecase(
     repo: EventRepository = Depends(get_events_repo),

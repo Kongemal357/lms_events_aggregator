@@ -5,6 +5,7 @@ from src.core.repositories.events import EventRepository
 
 class EventNotFound(Exception):
     """Raised when an event is not found in local database."""
+
     pass
 
 

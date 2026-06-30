@@ -3,8 +3,8 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request
 from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
 
-from src.api.dependencies import get_events_usecase, get_event_detail_usecase
-from src.core.schemas import EventListResponse, EventDetailResponse
+from src.api.dependencies import get_event_detail_usecase, get_events_usecase
+from src.core.schemas import EventDetailResponse, EventListResponse
 from src.core.usecases.get_event_detail import EventNotFound
 
 router = APIRouter(prefix="/events", tags=["events"])

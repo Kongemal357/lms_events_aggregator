@@ -22,6 +22,10 @@ class SyncRepository:
             await self.session.commit()
         return meta
 
+    async def rollback(self) -> None:
+        """Rollback the current transaction after an error."""
+        await self.session.rollback()
+
     async def update(self, last_changed_at: str, sync_status: str = "idle") -> None:
         """Update sync state after a run.
 

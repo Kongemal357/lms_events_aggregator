@@ -65,5 +65,6 @@ class SyncEventsUsecase:
             return synced_count
 
         except Exception:
+            await self.sync_repo.rollback()
             await self.sync_repo.update(meta.last_changed_at, "failed")
             raise

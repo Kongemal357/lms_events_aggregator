@@ -52,7 +52,6 @@ class EventRepository:
         event_data.setdefault("is_active", True)
         event_data.setdefault("last_synced_at", datetime.now(timezone.utc))
 
-        # Оставляем только поля из модели
         valid_fields = {c.name for c in Event.__table__.columns}
         filtered = {k: v for k, v in event_data.items() if k in valid_fields}
 

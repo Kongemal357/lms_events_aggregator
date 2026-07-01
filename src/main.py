@@ -3,11 +3,11 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from src.core.database import close_engine, AsyncSessionLocal
-from src.core.logging import setup_logging, LoggingMiddleware, logger
-from src.api.router import api_router
 from src.api.error_handlers import add_exception_handlers
+from src.api.router import api_router
 from src.core.clients.events_provider import EventsProviderClient
+from src.core.database import AsyncSessionLocal, close_engine
+from src.core.logging import LoggingMiddleware, logger, setup_logging
 from src.core.repositories.events import EventRepository
 from src.core.repositories.sync import SyncRepository
 from src.core.usecases.sync_events import SyncEventsUsecase

@@ -6,8 +6,12 @@ from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
 from src.api.dependencies import get_event_detail_usecase, get_events_usecase, get_seats_usecase
 from src.core.exeptions import EventNotFound, EventNotPublished
 from src.core.logging import logger
-from src.core.schemas import EventDetailResponse, EventListResponse, SeatsResponse, \
-    error_dict_400_404_409_422_500
+from src.core.schemas import (
+    EventDetailResponse,
+    EventListResponse,
+    SeatsResponse,
+    error_dict_400_404_409_422_500,
+)
 
 router = APIRouter(prefix="/events", tags=["events"])
 

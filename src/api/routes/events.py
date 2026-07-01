@@ -3,9 +3,11 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request
 from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
 
-from src.api.dependencies import get_event_detail_usecase, get_events_usecase
-from src.core.schemas import EventDetailResponse, EventListResponse
-from src.core.usecases.get_event_detail import EventNotFound
+from src.api.dependencies import get_event_detail_usecase, get_events_usecase, get_seats_usecase
+from src.core.exeptions import EventNotFound, EventNotPublished
+from src.core.logging import logger
+from src.core.schemas import EventDetailResponse, EventListResponse, SeatsResponse, \
+    error_dict_400_404_409_422_500
 
 router = APIRouter(prefix="/events", tags=["events"])
 
@@ -13,6 +15,7 @@ router = APIRouter(prefix="/events", tags=["events"])
 @router.get(
     "",
     response_model=EventListResponse,
+    responses=error_dict_400_404_409_422_500,
     summary="List events",
     description="""
     Returns a paginated list of events from the local database.
@@ -64,6 +67,10 @@ async def list_events(
             page_size=page_size,
             base_url=base_url,
         )
+    except EventNotFound:
+        raise HTTPException(status_code=404, detail="Event not found")
+    except EventNotPublished:
+        raise HTTPException(status_code=400, detail="Event is not published")
     except HTTPException:
         raise
     except IntegrityError:
@@ -72,11 +79,15 @@ async def list_events(
         raise HTTPException(status_code=500, detail="Database connection error")
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Database error")
+    except Exception:
+        logger.exception("unexpected_error")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get(
     "/{event_id}",
     response_model=EventDetailResponse,
+    responses=error_dict_400_404_409_422_500,
     summary="Get event details",
     description="""
     Returns detailed information about a specific event from the local database.
@@ -107,6 +118,8 @@ async def get_event(
         return await usecase.do(event_id)
     except EventNotFound:
         raise HTTPException(status_code=404, detail="Event not found")
+    except EventNotPublished:
+        raise HTTPException(status_code=400, detail="Event is not published")
     except HTTPException:
         raise
     except IntegrityError:
@@ -115,3 +128,7 @@ async def get_event(
         raise HTTPException(status_code=500, detail="Database connection error")
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Database error")
+    except Exception:
+        logger.exception("unexpected_error")
+        raise HTTPException(status_code=500, detail="Internal server error")
+

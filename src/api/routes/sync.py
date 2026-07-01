@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
 
 from src.api.dependencies import get_sync_usecase
-from src.core.schemas import SyncTriggerResponse
+from src.core.logging import logger
+from src.core.schemas import SyncTriggerResponse, error_dict_400_404_409_422_500
 from src.core.usecases.sync_events import SyncInProgress
 
 router = APIRouter(prefix="/sync", tags=["sync"])
@@ -11,6 +12,7 @@ router = APIRouter(prefix="/sync", tags=["sync"])
 @router.post(
     "/trigger",
     response_model=SyncTriggerResponse,
+    responses=error_dict_400_404_409_422_500,
     summary="Trigger manual sync",
     description="""
     Manually triggers a full synchronization of events from the
@@ -44,3 +46,6 @@ async def trigger_sync(usecase=Depends(get_sync_usecase)):
         raise HTTPException(status_code=500, detail="Database connection error")
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Database error")
+    except Exception:
+        logger.exception("unexpected_error")
+        raise HTTPException(status_code=500, detail="Internal server error")

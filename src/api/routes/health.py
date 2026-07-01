@@ -1,11 +1,14 @@
 from fastapi import APIRouter
 
+from src.core.schemas import error_dict_400_404_409_422_500
+
 router = APIRouter(tags=["health"])
 
 
 @router.get(
     "/health",
     summary="Health check",
+    responses=error_dict_400_404_409_422_500,
     description="""
     Returns the health status of the service.
 

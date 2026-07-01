@@ -7,6 +7,7 @@ from src.core.repositories.events import EventRepository
 from src.core.repositories.sync import SyncRepository
 from src.core.usecases.get_event_detail import GetEventDetailUsecase
 from src.core.usecases.get_events import GetEventsUsecase
+from src.core.usecases.get_seats import GetSeatsUsecase
 from src.core.usecases.sync_events import SyncEventsUsecase
 
 # ─── Repositories ─────────────────────────
@@ -57,3 +58,14 @@ async def get_sync_usecase(
 ) -> SyncEventsUsecase:
     """Return SyncEventsUsecase with all required dependencies."""
     return SyncEventsUsecase(client, events_repo, sync_repo)
+
+
+async def get_seats_usecase(
+    client: EventsProviderClient = Depends(get_client),
+    events_repo: EventRepository = Depends(get_events_repo),
+) -> GetSeatsUsecase:
+    """Return GetSeatsUsecase for fetching available seats from provider.
+
+    Results are cached in memory for 30 seconds.
+    """
+    return GetSeatsUsecase(client, events_repo)

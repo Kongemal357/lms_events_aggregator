@@ -122,6 +122,17 @@ class EventListResponse(BaseModel):
     results: list[EventSchema]
 
 
+# ─── Seats ───────────────────────────────────────────
+class SeatsResponse(BaseModel):
+    """Available seats for an event.
+
+    Returned by GET /api/events/{event_id}/seats/.
+    """
+
+    event_id: uuid.UUID
+    available_seats: list[str]
+
+
 # ─── Sync ───────────────────────────────────────────
 class SyncTriggerResponse(BaseModel):
     """Response after triggering a manual sync.

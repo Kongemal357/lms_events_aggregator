@@ -132,3 +132,52 @@ async def get_event(
         logger.exception("unexpected_error")
         raise HTTPException(status_code=500, detail="Internal server error")
 
+
+@router.get(
+    "/{event_id}/seats",
+    response_model=SeatsResponse,
+    responses=error_dict_400_404_409_422_500,
+    summary="Get available seats",
+    description="""
+    Returns a list of available seats for a specific event.
+    Data is fetched from the Events Provider API and cached for 30 seconds.
+    Only works for events with status "published".
+    """,
+)
+async def get_seats(
+    event_id: str = Path(
+        ...,
+        title="Event UUID",
+        description="The UUID of the event to get seats for.",
+    ),
+    usecase=Depends(get_seats_usecase),
+):
+    """Return available seats for an event.
+
+    :param event_id: UUID of the event.
+    :param usecase: GetSeatsUsecase dependency.
+
+    :return: List of available seat IDs.
+    :rtype: SeatsResponse
+
+    :raises HTTPException 404: If the event is not found.
+    :raises HTTPException 400: If the event is not published.
+    :raises HTTPException 500: If a network or database error occurs.
+    """
+    try:
+        return await usecase.do(event_id)
+    except EventNotFound:
+        raise HTTPException(status_code=404, detail="Event not found")
+    except EventNotPublished:
+        raise HTTPException(status_code=400, detail="Event is not published")
+    except HTTPException:
+        raise
+    except IntegrityError:
+        raise HTTPException(status_code=409, detail="Data integrity error")
+    except OperationalError:
+        raise HTTPException(status_code=500, detail="Database connection error")
+    except SQLAlchemyError:
+        raise HTTPException(status_code=500, detail="Database error")
+    except Exception:
+        logger.exception("unexpected_error")
+        raise HTTPException(status_code=500, detail="Internal server error")

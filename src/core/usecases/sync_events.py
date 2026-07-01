@@ -1,12 +1,9 @@
 from datetime import datetime, timezone
 
 from src.core.clients.events_provider import EventsPaginator, EventsProviderClient
+from src.core.exeptions import SyncInProgress
 from src.core.repositories.events import EventRepository
 from src.core.repositories.sync import SyncRepository
-
-
-class SyncInProgress(Exception):
-    pass
 
 
 class SyncEventsUsecase:
@@ -28,7 +25,7 @@ class SyncEventsUsecase:
         if meta.sync_status == "running":
             if meta.last_sync_started_at:
                 elapsed = (datetime.now(timezone.utc) - meta.last_sync_started_at).total_seconds()
-                if elapsed < 600:
+                if elapsed < 60:
                     raise SyncInProgress("Sync is already running")
 
         await self.sync_repo.update(meta.last_changed_at, "running")

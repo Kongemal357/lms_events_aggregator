@@ -1,12 +1,7 @@
 import uuid
 
+from src.core.exeptions import EventNotFound
 from src.core.repositories.events import EventRepository
-
-
-class EventNotFound(Exception):
-    """Raised when an event is not found in local database."""
-
-    pass
 
 
 class GetEventDetailUsecase:

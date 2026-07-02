@@ -1,13 +1,15 @@
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, EmailStr, field_validator, model_validator
 
 
 # ─── error_handler ───────────────────────────────────────────
 class ErrorResponse(BaseModel):
     """Standard error response, matching Events Provider API format."""
+
     detail: str
+
 
 error_dict_400_404_409_422_500: dict = {
     400: {"model": ErrorResponse, "description": "Bad request"},
@@ -130,6 +132,63 @@ class SeatsResponse(BaseModel):
 
     event_id: uuid.UUID
     available_seats: list[str]
+
+
+# ─── Tickets ─────────────────────────────────────────
+class TicketRequest(BaseModel):
+    """Request body for creating a ticket.
+
+    Used by POST /api/tickets/.
+    """
+
+    event_id: uuid.UUID
+    first_name: str
+    last_name: str
+    email: EmailStr
+    seat: str
+
+    @field_validator("first_name", "last_name")
+    @classmethod
+    def not_empty(cls, v: str) -> str:
+        """Validate that name fields are not empty or whitespace-only."""
+        if not v.strip():
+            raise ValueError("must not be empty")
+        return v.strip()
+
+    @field_validator("seat")
+    @classmethod
+    def valid_seat_format(cls, v: str) -> str:
+        """Validate seat format (e.g. 'A15')."""
+        if not v or len(v) < 2:
+            raise ValueError("invalid seat format")
+        return v.strip().upper()
+
+
+class TicketResponse(BaseModel):
+    """Response after successful registration.
+
+    Returned by POST /api/tickets/.
+    """
+
+    ticket_id: str
+
+
+class CancelRequest(BaseModel):
+    """Request body for cancelling a ticket.
+
+    Used by DELETE /api/tickets/{ticket_id}/.
+    """
+
+    ticket_id: str
+
+
+class CancelResponse(BaseModel):
+    """Response after successful cancellation.
+
+    Returned by DELETE /api/tickets/{ticket_id}/.
+    """
+
+    success: bool
 
 
 # ─── Sync ───────────────────────────────────────────

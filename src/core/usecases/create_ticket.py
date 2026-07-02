@@ -1,6 +1,7 @@
-# src/core/usecases/create_ticket.py
 import uuid
 from datetime import datetime, timezone
+
+import httpx
 
 from src.core.clients.events_provider import EventsProviderClient
 from src.core.exeptions import (
@@ -47,9 +48,15 @@ class CreateTicketUsecase:
             ticket_id = await self.client.register(
                 str(event_id), first_name, last_name, email, seat
             )
-        except Exception as e:
-            if "already sold" in str(e).lower():
-                raise SeatUnavailable()
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 400:
+                try:
+                    detail = e.response.json()
+                except Exception:
+                    detail = str(e)
+                if isinstance(detail, list) and len(detail) > 0:
+                    detail = detail[0]
+                raise SeatUnavailable(str(detail))
             raise
 
         await self.tickets_repo.create(

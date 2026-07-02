@@ -11,8 +11,12 @@ from src.core.exeptions import (
     TicketNotFound,
 )
 from src.core.logging import logger
-from src.core.schemas import CancelResponse, TicketRequest, TicketResponse, \
-    error_dict_400_404_409_422_500
+from src.core.schemas import (
+    CancelResponse,
+    TicketRequest,
+    TicketResponse,
+    error_dict_400_404_409_422_500,
+)
 
 router = APIRouter(prefix="/tickets", tags=["tickets"])
 

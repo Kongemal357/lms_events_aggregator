@@ -1,4 +1,3 @@
-# src/core/usecases/cancel_ticket.py
 from datetime import datetime, timezone
 
 from src.core.clients.events_provider import EventsProviderClient

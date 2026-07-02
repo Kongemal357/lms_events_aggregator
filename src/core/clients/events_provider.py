@@ -1,3 +1,4 @@
+import json as json_module
 import os
 from typing import AsyncIterator
 
@@ -75,11 +76,15 @@ class EventsProviderClient:
 
     async def unregister(self, event_id: str, ticket_id: str) -> bool:
         """Cancel a registration. Returns True on success."""
-        async with httpx.AsyncClient(timeout=self.timeout) as client:
-            response = await client.delete(
-                f"{self.base_url}/api/events/{event_id}/unregister/",
-                headers=self._headers(),
-                json={"ticket_id": ticket_id},
+        headers = self._headers()
+        headers["Content-Type"] = "application/json"
+
+        async with httpx.AsyncClient(timeout=self.timeout, follow_redirects=True) as client:
+            response = await client.request(
+                method="DELETE",
+                url=f"{self.base_url}/api/events/{event_id}/unregister/",
+                headers=headers,
+                content=json_module.dumps({"ticket_id": ticket_id}),
             )
             response.raise_for_status()
             return response.json()["success"]

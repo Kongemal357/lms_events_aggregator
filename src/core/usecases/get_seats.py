@@ -4,7 +4,6 @@ from cachetools import TTLCache
 
 from src.core.clients.events_provider import EventsProviderClient
 from src.core.exeptions import EventNotFound, EventNotPublished
-from src.core.logging import logger
 from src.core.repositories.events import EventRepository
 from src.core.schemas import SeatsResponse
 

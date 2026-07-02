@@ -15,18 +15,14 @@ def add_exception_handlers(app: FastAPI):
     async def http_exception_handler(request: Request, exc: StarletteHTTPException):
         return JSONResponse(
             status_code=exc.status_code,
-            content=ErrorResponse(
-                detail=str(exc.detail)
-            ).model_dump(),
+            content=ErrorResponse(detail=str(exc.detail)).model_dump(),
         )
 
     @app.exception_handler(IntegrityError)
     async def integrity_error_handler(request: Request, exc: IntegrityError):
         return JSONResponse(
             status_code=400,
-            content=ErrorResponse(
-                detail=str(exc.orig)
-            ).model_dump(),
+            content=ErrorResponse(detail=str(exc.orig)).model_dump(),
         )
 
     @app.exception_handler(RequestValidationError)
@@ -35,9 +31,7 @@ def add_exception_handlers(app: FastAPI):
         error_message = f"{first_error['loc'][-1]}: {first_error['msg']}"
         return JSONResponse(
             status_code=422,
-            content=ErrorResponse(
-                detail=error_message
-            ).model_dump(),
+            content=ErrorResponse(detail=error_message).model_dump(),
         )
 
     @app.exception_handler(Exception)
@@ -46,7 +40,5 @@ def add_exception_handlers(app: FastAPI):
         logger.exception("unhandled_exception", path=request.url.path)
         return JSONResponse(
             status_code=500,
-            content=ErrorResponse(
-                detail="Internal server error"
-            ).model_dump(),
+            content=ErrorResponse(detail="Internal server error").model_dump(),
         )

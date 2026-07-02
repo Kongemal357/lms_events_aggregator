@@ -5,6 +5,9 @@ from src.core.clients.events_provider import EventsProviderClient
 from src.core.database import get_session
 from src.core.repositories.events import EventRepository
 from src.core.repositories.sync import SyncRepository
+from src.core.repositories.tickets import TicketRepository
+from src.core.usecases.cancel_ticket import CancelTicketUsecase
+from src.core.usecases.create_ticket import CreateTicketUsecase
 from src.core.usecases.get_event_detail import GetEventDetailUsecase
 from src.core.usecases.get_events import GetEventsUsecase
 from src.core.usecases.get_seats import GetSeatsUsecase
@@ -69,3 +72,24 @@ async def get_seats_usecase(
     Results are cached in memory for 30 seconds.
     """
     return GetSeatsUsecase(client, events_repo)
+
+
+async def get_tickets_repo(session: AsyncSession = Depends(get_session)) -> TicketRepository:
+    """Return TicketRepository bound to the current database session."""
+    return TicketRepository(session)
+
+
+async def get_create_ticket_usecase(
+    client: EventsProviderClient = Depends(get_client),
+    events_repo: EventRepository = Depends(get_events_repo),
+    tickets_repo: TicketRepository = Depends(get_tickets_repo),
+) -> CreateTicketUsecase:
+    return CreateTicketUsecase(client, events_repo, tickets_repo)
+
+
+async def get_cancel_ticket_usecase(
+    client: EventsProviderClient = Depends(get_client),
+    events_repo: EventRepository = Depends(get_events_repo),
+    tickets_repo: TicketRepository = Depends(get_tickets_repo),
+) -> CancelTicketUsecase:
+    return CancelTicketUsecase(client, events_repo, tickets_repo)

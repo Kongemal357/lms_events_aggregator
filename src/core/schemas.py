@@ -11,11 +11,10 @@ class ErrorResponse(BaseModel):
     detail: str
 
 
-error_dict_400_404_409_422_500: dict = {
-    400: {"model": ErrorResponse, "description": "Bad request"},
+error_dict_400_404_409_500: dict = {
+    400: {"model": ErrorResponse, "description": "Bad request or validation error"},
     404: {"model": ErrorResponse, "description": "Not found"},
     409: {"model": ErrorResponse, "description": "Conflict"},
-    422: {"model": ErrorResponse, "description": "Validation error"},
     500: {"model": ErrorResponse, "description": "Internal server error"},
 }
 

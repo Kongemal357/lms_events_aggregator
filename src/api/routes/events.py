@@ -10,7 +10,7 @@ from src.core.schemas import (
     EventDetailResponse,
     EventListResponse,
     SeatsResponse,
-    error_dict_400_404_409_422_500,
+    error_dict_400_404_409_500,
 )
 
 router = APIRouter(prefix="/events", tags=["events"])
@@ -19,7 +19,7 @@ router = APIRouter(prefix="/events", tags=["events"])
 @router.get(
     "",
     response_model=EventListResponse,
-    responses=error_dict_400_404_409_422_500,
+    responses=error_dict_400_404_409_500,
     summary="List events",
     description="""
     Returns a paginated list of events from the local database.
@@ -91,7 +91,7 @@ async def list_events(
 @router.get(
     "/{event_id}",
     response_model=EventDetailResponse,
-    responses=error_dict_400_404_409_422_500,
+    responses=error_dict_400_404_409_500,
     summary="Get event details",
     description="""
     Returns detailed information about a specific event from the local database.
@@ -140,7 +140,7 @@ async def get_event(
 @router.get(
     "/{event_id}/seats",
     response_model=SeatsResponse,
-    responses=error_dict_400_404_409_422_500,
+    responses=error_dict_400_404_409_500,
     summary="Get available seats",
     description="""
     Returns a list of available seats for a specific event.

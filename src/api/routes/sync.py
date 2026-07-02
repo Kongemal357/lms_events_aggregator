@@ -3,7 +3,7 @@ from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
 
 from src.api.dependencies import get_sync_usecase
 from src.core.logging import logger
-from src.core.schemas import SyncTriggerResponse, error_dict_400_404_409_422_500
+from src.core.schemas import SyncTriggerResponse, error_dict_400_404_409_500
 from src.core.usecases.sync_events import SyncInProgress
 
 router = APIRouter(prefix="/sync", tags=["sync"])
@@ -12,7 +12,7 @@ router = APIRouter(prefix="/sync", tags=["sync"])
 @router.post(
     "/trigger",
     response_model=SyncTriggerResponse,
-    responses=error_dict_400_404_409_422_500,
+    responses=error_dict_400_404_409_500,
     summary="Trigger manual sync",
     description="""
     Manually triggers a full synchronization of events from the

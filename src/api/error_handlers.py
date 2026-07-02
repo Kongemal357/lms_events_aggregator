@@ -30,7 +30,7 @@ def add_exception_handlers(app: FastAPI):
         first_error = exc.errors()[0]
         error_message = f"{first_error['loc'][-1]}: {first_error['msg']}"
         return JSONResponse(
-            status_code=422,
+            status_code=400,
             content=ErrorResponse(detail=error_message).model_dump(),
         )
 

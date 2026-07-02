@@ -15,7 +15,7 @@ from src.core.schemas import (
     CancelResponse,
     TicketRequest,
     TicketResponse,
-    error_dict_400_404_409_422_500,
+    error_dict_400_404_409_500,
 )
 
 router = APIRouter(prefix="/tickets", tags=["tickets"])
@@ -25,7 +25,7 @@ router = APIRouter(prefix="/tickets", tags=["tickets"])
     "",
     response_model=TicketResponse,
     status_code=201,
-    responses=error_dict_400_404_409_422_500,
+    responses=error_dict_400_404_409_500,
     summary="Register on an event",
     description="Register a participant on an event with seat selection.",
 )
@@ -65,7 +65,7 @@ async def create_ticket(
 @router.delete(
     "/{ticket_id}",
     response_model=CancelResponse,
-    responses=error_dict_400_404_409_422_500,
+    responses=error_dict_400_404_409_500,
     summary="Cancel registration",
     description="Cancel a registration by ticket ID.",
 )

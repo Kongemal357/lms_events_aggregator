@@ -3,7 +3,12 @@ import uuid
 from datetime import datetime, timezone
 
 from src.core.clients.events_provider import EventsProviderClient
-from src.core.exeptions import EventNotFound, EventNotPublished
+from src.core.exeptions import (
+    EventNotFound,
+    EventNotPublished,
+    RegistrationDeadlinePassed,
+    SeatUnavailable,
+)
 from src.core.repositories.events import EventRepository
 from src.core.repositories.tickets import TicketRepository
 from src.core.schemas import TicketResponse

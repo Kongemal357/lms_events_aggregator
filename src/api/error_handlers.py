@@ -16,7 +16,7 @@ def add_exception_handlers(app: FastAPI):
         return JSONResponse(
             status_code=exc.status_code,
             content=ErrorResponse(
-                error_type="HTTPException", error_message=str(exc.detail)
+                detail=str(exc.detail)
             ).model_dump(),
         )
 
@@ -25,7 +25,7 @@ def add_exception_handlers(app: FastAPI):
         return JSONResponse(
             status_code=400,
             content=ErrorResponse(
-                error_type="IntegrityError", error_message=str(exc.orig)
+                detail=str(exc.orig)
             ).model_dump(),
         )
 
@@ -36,7 +36,7 @@ def add_exception_handlers(app: FastAPI):
         return JSONResponse(
             status_code=422,
             content=ErrorResponse(
-                error_type="ValidationError", error_message=error_message
+                detail=error_message
             ).model_dump(),
         )
 
@@ -47,6 +47,6 @@ def add_exception_handlers(app: FastAPI):
         return JSONResponse(
             status_code=500,
             content=ErrorResponse(
-                error_type=type(exc).__name__, error_message="Internal server error"
+                detail="Internal server error"
             ).model_dump(),
         )

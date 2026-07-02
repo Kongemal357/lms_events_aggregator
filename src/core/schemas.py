@@ -6,9 +6,8 @@ from pydantic import BaseModel, model_validator
 
 # ─── error_handler ───────────────────────────────────────────
 class ErrorResponse(BaseModel):
-    error_type: str
-    error_message: str
-
+    """Standard error response, matching Events Provider API format."""
+    detail: str
 
 error_dict_400_404_409_422_500: dict = {
     400: {"model": ErrorResponse},
